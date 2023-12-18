@@ -7,11 +7,12 @@ class AddBookScreen extends StatefulWidget {
 }
 
 class _AddBookScreenState extends State<AddBookScreen> {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController authorController = TextEditingController();
-  TextEditingController genreController = TextEditingController();
-  TextEditingController ratingController = TextEditingController();
-  TextEditingController imageUrlController = TextEditingController(); // Новый контроллер для URL-изображения
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _authorController = TextEditingController();
+  final TextEditingController _genreController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  BookStatus _selectedStatus = BookStatus.read; // Инициализация статуса
 
   @override
   Widget build(BuildContext context) {
@@ -24,32 +25,56 @@ class _AddBookScreenState extends State<AddBookScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(labelText: 'Название книги'),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(labelText: 'Название'),
             ),
-            TextField(
-              controller: authorController,
+            TextFormField(
+              controller: _authorController,
               decoration: InputDecoration(labelText: 'Автор'),
             ),
-            TextField(
-              controller: genreController,
+            TextFormField(
+              controller: _genreController,
               decoration: InputDecoration(labelText: 'Жанр'),
             ),
-            TextField(
-              controller: ratingController,
-              decoration: InputDecoration(labelText: 'Рейтинг'),
-            ),
-            TextField(
-              controller: imageUrlController,
+            TextFormField(
+              controller: _imageUrlController,
               decoration: InputDecoration(labelText: 'URL изображения'),
             ),
-            SizedBox(height: 16),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: InputDecoration(labelText: 'Описание'),
+            ),
+            SizedBox(height: 16.0),
+            Text('Статус:'),
+            DropdownButtonFormField<BookStatus>(
+              value: _selectedStatus,
+              items: [
+                DropdownMenuItem(
+                  value: BookStatus.read,
+                  child: Text('Прочтено'),
+                ),
+                DropdownMenuItem(
+                  value: BookStatus.postponed,
+                  child: Text('Отложено'),
+                ),
+                DropdownMenuItem(
+                  value: BookStatus.willReadLater,
+                  child: Text('Прочитаю позднее'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedStatus = value!;
+                });
+              },
+            ),
+            SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                _addBook();
+                _saveBook();
               },
-              child: Text('Добавить книгу'),
+              child: Text('Сохранить книгу'),
             ),
           ],
         ),
@@ -57,23 +82,27 @@ class _AddBookScreenState extends State<AddBookScreen> {
     );
   }
 
-  void _addBook() {
-    if (titleController.text.isNotEmpty &&
-        authorController.text.isNotEmpty &&
-        genreController.text.isNotEmpty &&
-        ratingController.text.isNotEmpty) {
-      var newBook = Book(
-        title: titleController.text,
-        author: authorController.text,
-        genre: genreController.text,
-        date: DateTime.now(),
-        rating: double.parse(ratingController.text),
-        imageUrl: imageUrlController.text, // Присваиваем URL-изображения
-      );
+  void _saveBook() {
+    // Получите значения из контроллеров и создайте экземпляр Book
+    String title = _titleController.text;
+    String author = _authorController.text;
+    String genre = _genreController.text;
+    String imageUrl = _imageUrlController.text;
+    String description = _descriptionController.text;
 
-      Navigator.pop(context, newBook); // Передача экземпляра книги обратно
-    } else {
-      // Обработка некорректных данных
-    }
+    // Создайте новый экземпляр Book с выбранным статусом
+    Book newBook = Book(
+      id: null, // Передайте null, чтобы база данных смогла присвоить ID
+      title: title,
+      author: author,
+      genre: genre,
+      date: DateTime.now(),
+      imageUrl: imageUrl,
+      description: description,
+      status: _selectedStatus,
+    );
+
+    // Отправьте новую книгу обратно на предыдущий экран
+    Navigator.pop(context, newBook);
   }
 }

@@ -1,59 +1,41 @@
-class Book {
-  int? id;
-  String title;
-  String author;
-  String genre;
-  DateTime date;
-  double rating;
-  bool isRead;
-  String? imageUrl; // Добавлено новое поле для URL-изображения
+enum BookStatus {
+  read,
+  postponed,
+  willReadLater,
+}
 
+class Book {
+  final int? id;
+  final String title;
+  final String author;
+  final String genre;
+  final DateTime date;
+  final String imageUrl;
+  final String description;
+  final BookStatus status;// Добавим поле description
+
+  // Изменим конструктор
   Book({
-    this.id,
+    required this.id,
     required this.title,
     required this.author,
     required this.genre,
     required this.date,
-    required this.rating,
-    this.isRead = false,
-    this.imageUrl, // Обновленный конструктор
+    required this.imageUrl,
+    required this.description,
+    required this.status,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'author': author,
-      'genre': genre,
-      'date': date.toIso8601String(),
-      'rating': rating,
-      'isRead': isRead ? 1 : 0,
-      'imageUrl': imageUrl, // Добавлено в отображение базы данных
-    };
-  }
-
-  factory Book.fromMap(Map<String, dynamic> map) {
-    return Book(
-      id: map['id'],
-      title: map['title'],
-      author: map['author'],
-      genre: map['genre'],
-      date: DateTime.parse(map['date']),
-      rating: map['rating'],
-      isRead: map['isRead'] == 1,
-      imageUrl: map['imageUrl'], // Добавлено в отображение базы данных
-    );
-  }
-
+  // Изменим фабричный метод copyWith
   Book copyWith({
     int? id,
     String? title,
     String? author,
     String? genre,
     DateTime? date,
-    double? rating,
-    bool? isRead,
-    String? imageUrl, // Добавлено в метод copyWith
+    String? imageUrl,
+    String? description,
+    BookStatus? status,
   }) {
     return Book(
       id: id ?? this.id,
@@ -61,9 +43,61 @@ class Book {
       author: author ?? this.author,
       genre: genre ?? this.genre,
       date: date ?? this.date,
-      rating: rating ?? this.rating,
-      isRead: isRead ?? this.isRead,
-      imageUrl: imageUrl ?? this.imageUrl, // Добавлено в метод copyWith
+      imageUrl: imageUrl ?? this.imageUrl,
+      description: description ?? this.description,
+      status: status ?? this.status,
+    );
+  }
+
+  // Добавим фабричный метод fromMap для создания экземпляра Book из Map
+  factory Book.fromMap(Map<String, dynamic> map) {
+    return Book(
+      id: map['id'],
+      title: map['title'],
+      author: map['author'],
+      genre: map['genre'],
+      date: DateTime.parse(map['date']),
+      imageUrl: map['imageUrl'],
+      description: map['description'],
+      status: map['status'] != null ? BookStatus.values.firstWhere((e) => e.toString() == 'BookStatus.${map['status']}') : BookStatus.read,
+    );
+  }
+
+  // Добавим метод toMap для преобразования экземпляра Book в Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'author': author,
+      'genre': genre,
+      'date': date.toIso8601String(),
+      'imageUrl': imageUrl,
+      'description': description,
+      'status': _getStatusString(status),
+    };
+  }
+  static String _getStatusString(BookStatus status) {
+    switch (status) {
+      case BookStatus.read:
+        return 'read';
+      case BookStatus.postponed:
+        return 'postponed';
+      case BookStatus.willReadLater:
+        return 'willReadLater';
+    }
+  }
+  Book copyWithStatus({
+    BookStatus? status,
+  }) {
+    return Book(
+      id: id,
+      title: title,
+      author: author,
+      genre: genre,
+      date: date,
+      imageUrl: imageUrl,
+      description: description,
+      status: status ?? this.status,
     );
   }
 }

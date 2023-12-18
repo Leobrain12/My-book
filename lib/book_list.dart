@@ -2,76 +2,12 @@ import 'package:flutter/material.dart';
 import 'add_book_screen.dart';
 import 'book.dart';
 import 'database_helper.dart';
-import 'package:intl/intl.dart';
+import 'BookDetailsScreen.dart';
+import 'EditBookScreen.dart';
 
 class BookList extends StatefulWidget {
   @override
   _BookListState createState() => _BookListState();
-}
-class BookDetailsScreen extends StatelessWidget {
-  final Book book;
-
-  BookDetailsScreen({required this.book});
-
-  @override
-  Widget build(BuildContext context) {
-    String formattedDate = DateFormat('yy.MM.dd HH:mm').format(book.date);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Детали книги'),
-      ),
-      body: SingleChildScrollView( // Оборачиваем в SingleChildScrollView
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 650.0,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                image: DecorationImage(
-                  image: NetworkImage(
-                    book.imageUrl ??
-                        'https://parpol.ru/wp-content/uploads/2019/09/placeholder.png',
-                  ),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            buildDetail('Название', book.title),
-            buildDetail('Автор', book.author),
-            buildDetail('Жанр', book.genre),
-            buildDetail('Рейтинг', book.rating.toString()),
-            buildDetail('Дата', formattedDate),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildDetail(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$label:',
-          style: const TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(fontSize: 18.0),
-        ),
-        SizedBox(height: 12.0),
-      ],
-    );
-  }
 }
 
 class _BookListState extends State<BookList> {
@@ -93,15 +29,13 @@ class _BookListState extends State<BookList> {
   }
 
   void _addBook(Book newBook) async {
-    // Проверка наличия URL изображения
     if (newBook.imageUrl == null || newBook.imageUrl!.isEmpty) {
-      // Если URL отсутствует, используем стандартное изображение
       newBook = newBook.copyWith(
         imageUrl: 'https://parpol.ru/wp-content/uploads/2019/09/placeholder.png',
       );
     }
 
-    int insertedId = await _databaseHelper.insertBook(newBook);
+    int? insertedId = await _databaseHelper.insertBook(newBook);
     Book insertedBook = newBook.copyWith(id: insertedId);
 
     setState(() {
@@ -109,45 +43,86 @@ class _BookListState extends State<BookList> {
     });
   }
 
+  void _deleteBook(Book book) async {
+    if (book.id != null) {
+      await _databaseHelper.deleteBook(book.id!);
+      setState(() {
+        books.remove(book);
+      });
+    }
+  }
+
+  void _editBook(Book book) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditBookScreen(book: book),
+      ),
+    );
+
+    if (result != null && result is bool && result) {
+      // Обновляем список книг
+      await Future.delayed(Duration.zero, () => _loadBooks());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Мои книги'),
+        title: const Text('Мои книги'),
       ),
-      body: ListView.builder(
+      body: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+          childAspectRatio: 0.55,
+        ),
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: true,
         itemCount: books.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            child: Card(
-              elevation: 4.0,
-              child: ListTile(
-                title: Text(
-                  books[index].title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(books[index].author),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _deleteBook(books[index]);
-                  },
-                ),
-                leading: SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: ClipRRect(
+          return Card(
+            elevation: 4.0,
+            child: InkWell(
+              onTap: () {
+                _showBookDetails(books[index], context);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
-                      books[index].imageUrl!,
+                      books[index].imageUrl,
                       fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 270.0,
                     ),
                   ),
-                ),
-                onTap: () {
-                  _showBookDetails(books[index]);
-                },
+                  const SizedBox(height: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          books[index].title.length > 20
+                              ? books[index].title.substring(0, 20) + '...'
+                              : books[index].title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          books[index].author.length > 20
+                              ? books[index].author.substring(0, 20) + '...'
+                              : books[index].author,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -157,7 +132,7 @@ class _BookListState extends State<BookList> {
         onPressed: () {
           _navigateToAddBookScreen();
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -173,18 +148,21 @@ class _BookListState extends State<BookList> {
     }
   }
 
-  void _deleteBook(Book book) async {
-    await _databaseHelper.deleteBook(book.id!);
-
-    _loadBooks(); // Обновление списка книг после удаления
-  }
-
-  void _showBookDetails(Book book) {
-    Navigator.push(
+  void _showBookDetails(Book book, BuildContext context) async {
+    final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)),
+      MaterialPageRoute(
+        builder: (context) => BookDetailsScreen(
+          book: book,
+          onDelete: () {
+            _deleteBook(book);
+          },
+        ),
+      ),
     );
+
+    if (result != null && result is Book) {
+      _editBook(result);
+    }
   }
 }
-
-
