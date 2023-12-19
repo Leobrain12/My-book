@@ -19,6 +19,7 @@ class _BookListState extends State<BookList> {
     super.initState();
     _loadBooks();
   }
+
   Future<void> _loadBooks() async {
     final List<Book> loadedBooks = await _databaseHelper.getBooks();
 
@@ -92,40 +93,43 @@ class _BookListState extends State<BookList> {
               onTap: () {
                 _showBookDetails(books[index], context);
               },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.network(
-                      books[index].imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 270.0,
+              child: Container(
+                height: 300.0, // Установите желаемую высоту
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        books[index].imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: 200.0,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          books[index].title.length > 20
-                              ? '${books[index].title.substring(0, 20)}...'
-                              : books[index].title,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          books[index].author.length > 20
-                              ? '${books[index].author.substring(0, 20)}...'
-                              : books[index].author,
-                        ),
-                      ],
+                    const SizedBox(height: 8.0),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            books[index].title.length > 20
+                                ? '${books[index].title.substring(0, 20)}...'
+                                : books[index].title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4.0),
+                          Text(
+                            books[index].author.length > 20
+                                ? '${books[index].author.substring(0, 20)}...'
+                                : books[index].author,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
