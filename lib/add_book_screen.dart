@@ -18,7 +18,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Добавить книгу'),
+        title: const Text('Добавить книгу'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -27,32 +27,32 @@ class _AddBookScreenState extends State<AddBookScreen> {
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Название'),
+              decoration: const InputDecoration(labelText: 'Название'),
             ),
             TextFormField(
               controller: _authorController,
-              decoration: InputDecoration(labelText: 'Автор'),
+              decoration: const InputDecoration(labelText: 'Автор'),
             ),
             TextFormField(
               controller: _genreController,
-              decoration: InputDecoration(labelText: 'Жанр'),
+              decoration: const InputDecoration(labelText: 'Жанр'),
             ),
             TextFormField(
               controller: _imageUrlController,
-              decoration: InputDecoration(labelText: 'URL изображения'),
+              decoration: const InputDecoration(labelText: 'URL изображения'),
             ),
             TextFormField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Описание'),
+              decoration: const InputDecoration(labelText: 'Описание'),
             ),
-            SizedBox(height: 16.0),
-            Text('Статус:'),
+            const SizedBox(height: 16.0),
+            const Text('Статус:'),
             DropdownButtonFormField<BookStatus>(
               value: _selectedStatus,
-              items: [
+              items: const [
                 DropdownMenuItem(
                   value: BookStatus.read,
-                  child: Text('Прочтено'),
+                  child: Text('Прочтино'),
                 ),
                 DropdownMenuItem(
                   value: BookStatus.postponed,

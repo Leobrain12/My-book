@@ -82,6 +82,7 @@ class _BookListState extends State<BookList> {
           mainAxisSpacing: 8.0,
           childAspectRatio: 0.5,
         ),
+        shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         itemCount: books.length,
         itemBuilder: (context, index) {
@@ -111,14 +112,14 @@ class _BookListState extends State<BookList> {
                       children: [
                         Text(
                           books[index].title.length > 20
-                              ? books[index].title.substring(0, 20) + '...'
+                              ? '${books[index].title.substring(0, 20)}...'
                               : books[index].title,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4.0),
                         Text(
                           books[index].author.length > 20
-                              ? books[index].author.substring(0, 20) + '...'
+                              ? '${books[index].author.substring(0, 20)}...'
                               : books[index].author,
                         ),
                       ],
