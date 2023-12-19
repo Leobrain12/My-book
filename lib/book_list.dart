@@ -61,10 +61,7 @@ class _BookListState extends State<BookList> {
     );
 
     if (result != null && result is Book) {
-      // Обновляем список книг после возврата из экрана редактирования
       await _loadBooks();
-
-      // Получаем updatedBook, переданный через параметр arguments
       Book updatedBook = result;
       print('Updated Book: $updatedBook');
     }
@@ -94,7 +91,7 @@ class _BookListState extends State<BookList> {
                 _showBookDetails(books[index], context);
               },
               child: Container(
-                height: 300.0, // Установите желаемую высоту
+                height: 300.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -135,11 +132,23 @@ class _BookListState extends State<BookList> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      floatingActionButton: InkWell(
+        onTap: () {
           _navigateToAddBookScreen();
         },
-        child: const Icon(Icons.add),
+        child: Container(
+          width: 56.0,
+          height: 56.0,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+          ),
+          child: Image.asset(
+            'lib/assets/ic_button.gif',
+            width: 40.0,
+            height: 40.0,
+          ),
+        ),
       ),
     );
   }
