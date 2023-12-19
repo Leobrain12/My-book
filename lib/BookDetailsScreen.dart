@@ -7,10 +7,8 @@ import 'database_helper.dart';
 class BookDetailsScreen extends StatefulWidget {
   Book book;
   final VoidCallback onDelete;
-  final Function(Book) onBookUpdated;
 
-  BookDetailsScreen({required this.book, required this.onDelete, required this.onBookUpdated});
-
+  BookDetailsScreen({required this.book, required this.onDelete });
 
   @override
   _BookDetailsScreenState createState() => _BookDetailsScreenState();
@@ -116,7 +114,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       setState(() {
         widget.book = result;
       });
-      widget.onBookUpdated(result);
     }
   }
 

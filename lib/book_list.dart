@@ -19,7 +19,6 @@ class _BookListState extends State<BookList> {
     super.initState();
     _loadBooks();
   }
-
   Future<void> _loadBooks() async {
     final List<Book> loadedBooks = await _databaseHelper.getBooks();
 
@@ -60,9 +59,13 @@ class _BookListState extends State<BookList> {
       ),
     );
 
-    if (result != null && result is bool && result) {
-      // Обновляем список книг
-      await Future.delayed(Duration.zero, () => _loadBooks());
+    if (result != null && result is Book) {
+      // Обновляем список книг после возврата из экрана редактирования
+      await _loadBooks();
+
+      // Получаем updatedBook, переданный через параметр arguments
+      Book updatedBook = result;
+      print('Updated Book: $updatedBook');
     }
   }
 
@@ -77,10 +80,9 @@ class _BookListState extends State<BookList> {
           crossAxisCount: 2,
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
-          childAspectRatio: 0.55,
+          childAspectRatio: 0.5,
         ),
         physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
         itemCount: books.length,
         itemBuilder: (context, index) {
           return Card(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'book.dart';
 import 'database_helper.dart';
+import 'book_list.dart';
 
 class EditBookScreen extends StatefulWidget {
   final Book book;
@@ -66,8 +67,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
   }
 
   void _saveChanges() async {
+    BuildContext currentContext = context;
+
     // Создаем новый экземпляр книги с измененными данными
-    Book updatedBook = widget.book.copyWith(
+      Book updatedBook = widget.book.copyWith(
       title: _titleController.text,
       author: _authorController.text,
       genre: _genreController.text,
@@ -75,7 +78,20 @@ class _EditBookScreenState extends State<EditBookScreen> {
     );
 
     // Обновляем книгу в базе данных
-      await DatabaseHelper().updateBook(updatedBook);
-      Navigator.pop(context, updatedBook);
+      int result = await DatabaseHelper().updateBook(updatedBook);
+    if (result > 0) {
+      // Если обновление прошло успешно, закрываем экран редактирования и передаем обновленную книгу
+      Navigator.pushReplacement(
+        currentContext,
+        MaterialPageRoute(
+          builder: (context) => BookList(),
+          settings: RouteSettings(arguments: updatedBook),
+        ),
+      );
+    } else {
+      // Если произошла ошибка при обновлении, выведите сообщение об ошибке или выполните другие действия по вашему усмотрению
+      print('Ошибка при обновлении книги в базе данных');
+      // Добавьте дополнительную обработку ошибки по вашему усмотрению
+    }
   }
 }
