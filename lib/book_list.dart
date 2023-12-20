@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'add_book_screen.dart';
-import 'book.dart';
-import 'database_helper.dart';
-import 'BookDetailsScreen.dart';
-import 'EditBookScreen.dart';
+import 'book.dart';  // Импортируем класс Book
+import 'add_book_screen.dart';  // Импортируем AddBookScreen
+import 'EditBookScreen.dart';  // Импортируем EditBookScreen
+import 'BookDetailsScreen.dart';  // Импортируем BookDetailsScreen
+import 'database_helper.dart';  // Импортируем DatabaseHelper
 
 class BookList extends StatefulWidget {
+
+  final String userId;
+  BookList({required this.userId});
+
   @override
   _BookListState createState() => _BookListState();
 }
@@ -21,7 +25,7 @@ class _BookListState extends State<BookList> {
   }
 
   Future<void> _loadBooks() async {
-    final List<Book> loadedBooks = await _databaseHelper.getBooks();
+    final List<Book> loadedBooks = await _databaseHelper.getBooks(widget.userId);
 
     setState(() {
       books = loadedBooks;
@@ -61,10 +65,7 @@ class _BookListState extends State<BookList> {
     );
 
     if (result != null && result is Book) {
-      // Обновляем список книг после возврата из экрана редактирования
       await _loadBooks();
-
-      // Получаем updatedBook, переданный через параметр arguments
       Book updatedBook = result;
       print('Updated Book: $updatedBook');
     }
@@ -94,7 +95,7 @@ class _BookListState extends State<BookList> {
                 _showBookDetails(books[index], context);
               },
               child: Container(
-                height: 300.0, // Установите желаемую высоту
+                height: 300.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -135,11 +136,23 @@ class _BookListState extends State<BookList> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      floatingActionButton: InkWell(
+        onTap: () {
           _navigateToAddBookScreen();
         },
-        child: const Icon(Icons.add),
+        child: Container(
+          width: 56.0,
+          height: 56.0,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+          ),
+          child: Image.asset(
+            'lib/assets/ic_button.gif',
+            width: 40.0,
+            height: 40.0,
+          ),
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'book_list.dart';
 
 class EditBookScreen extends StatefulWidget {
   final Book book;
+  final String userId;
 
   EditBookScreen({Key? key, required this.book}) : super(key: key);
 
