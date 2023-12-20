@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'add_book_screen.dart';
-import 'book.dart';
-import 'database_helper.dart';
-import 'BookDetailsScreen.dart';
-import 'EditBookScreen.dart';
+import 'book.dart';  // Импортируем класс Book
+import 'add_book_screen.dart';  // Импортируем AddBookScreen
+import 'EditBookScreen.dart';  // Импортируем EditBookScreen
+import 'BookDetailsScreen.dart';  // Импортируем BookDetailsScreen
+import 'database_helper.dart';  // Импортируем DatabaseHelper
 
 class BookList extends StatefulWidget {
+
+  final String userId;
+  BookList({required this.userId});
+
   @override
   _BookListState createState() => _BookListState();
 }
@@ -21,7 +25,7 @@ class _BookListState extends State<BookList> {
   }
 
   Future<void> _loadBooks() async {
-    final List<Book> loadedBooks = await _databaseHelper.getBooks();
+    final List<Book> loadedBooks = await _databaseHelper.getBooks(widget.userId);
 
     setState(() {
       books = loadedBooks;

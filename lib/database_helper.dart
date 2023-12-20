@@ -25,6 +25,7 @@ class DatabaseHelper {
 
   static const String tableBooks = 'books';
   static const String columnId = 'id';
+  static const String columnUserId = 'userId';
   static const String columnTitle = 'title';
   static const String columnAuthor = 'author';
   static const String columnGenre = 'genre';
@@ -37,6 +38,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS $tableBooks (
         $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+        $columnUserId TEXT,
         $columnTitle TEXT,
         $columnAuthor TEXT,
         $columnGenre TEXT,
@@ -53,9 +55,13 @@ class DatabaseHelper {
     return await db.insert(tableBooks, book.toMap());
   }
 
-  Future<List<Book>> getBooks() async {
+  Future<List<Book>> getBooks(String userId) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(tableBooks);
+    final List<Map<String, dynamic>> maps = await db.query(
+        tableBooks,
+        where: '$columnUserId = ?',
+        whereArgs: [userId],
+    );
 
     return List.generate(maps.length, (i) {
       return Book.fromMap(maps[i]);

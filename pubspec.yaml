@@ -34,6 +34,10 @@ dependencies:
   cached_network_image: any
   intl: any
   path: any
+  flutter_bloc: any
+  firebase_core: any
+  firebase_auth: any
+  cloud_firestore: any
 
 
 
